@@ -1,0 +1,70 @@
+﻿name: Release Dataset and Results Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag to release (for manual runs, e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      include_lfs_status:
+        description: 'Include Git LFS status text file in release assets'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate manifests before release
+        run: |
+          python scripts/validate_repo_manifests.py
+
+      - name: Build release bundles
+        run: |
+          mkdir -p dist
+          tar -czf dist/datasets-samples.tar.gz datasets/samples datasets/manifest.json datasets/README.md
+          tar -czf dist/results-artifacts.tar.gz results/graphs results/metrics results/reports results/samples results/manifest.json results/README.md
+          zip -r dist/datasets-samples.zip datasets/samples datasets/manifest.json datasets/README.md
+          zip -r dist/results-artifacts.zip results/graphs results/metrics results/reports results/samples results/manifest.json results/README.md
+          sha256sum dist/* > dist/SHA256SUMS.txt
+
+      - name: Optional Git LFS status report
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_lfs_status }}
+        run: |
+          git lfs version > dist/lfs-status.txt || true
+          git lfs ls-files >> dist/lfs-status.txt || true
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/datasets-samples.tar.gz
+            dist/datasets-samples.zip
+            dist/results-artifacts.tar.gz
+            dist/results-artifacts.zip
+            dist/SHA256SUMS.txt
+
+      - name: Upload optional LFS status asset
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_lfs_status }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          files: dist/lfs-status.txt

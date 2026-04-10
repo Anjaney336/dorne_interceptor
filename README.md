@@ -1,5 +1,8 @@
 ﻿# AI Drone Interceptor
 
+[![CI](https://github.com/Anjaney336/dorne_interceptor/actions/workflows/ci.yml/badge.svg)](https://github.com/Anjaney336/dorne_interceptor/actions/workflows/ci.yml)
+[![Release Artifacts](https://github.com/Anjaney336/dorne_interceptor/actions/workflows/release-artifacts.yml/badge.svg)](https://github.com/Anjaney336/dorne_interceptor/actions/workflows/release-artifacts.yml)
+
 Research-grade autonomous interception stack with simulation, anti-spoofing navigation, AirSim mission replay, dashboard telemetry, and validation tooling.
 
 ## Modules
@@ -37,6 +40,16 @@ python scripts/run_day10_execution.py --project-root .
 python scripts/run_combined_target_validation.py
 ```
 
+## CI/CD and Release
+- Continuous integration: `.github/workflows/ci.yml`
+  - Lint (runtime-critical checks)
+  - Manifest validation
+  - Pytest smoke suite
+- Artifact release pipeline: `.github/workflows/release-artifacts.yml`
+  - Generates zipped/tarred dataset/result bundles
+  - Publishes release assets on `v*` tags or manual dispatch
+  - Optional Git LFS status attachment
+
 ## Professional Artifacts Included
 - Dataset samples with labels for `combined_target_yolo` and `visdrone_yolo`
 - Sovereign report figures and PDF dossier
@@ -46,4 +59,11 @@ python scripts/run_combined_target_validation.py
 ## Rebuild Manifests
 ```powershell
 python scripts/generate_repo_manifests.py
+python scripts/validate_repo_manifests.py
 ```
+
+## Contributing and Planning
+- Contributor guide: `CONTRIBUTING.md`
+- Issue templates: `.github/ISSUE_TEMPLATE/`
+- PR template: `.github/pull_request_template.md`
+- Project board setup: `docs/GITHUB_PROJECT_SETUP.md`

@@ -8,10 +8,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def summarize_dir(path: Path) -> dict:
+    if not path.exists():
+        return {
+            'path': str(path.relative_to(ROOT)).replace('\\', '/'),
+            'exists': False,
+            'file_count': 0,
+            'total_bytes': 0,
+            'extensions': {},
+        }
     files = [p for p in path.rglob('*') if p.is_file()]
     exts = Counter((p.suffix.lower() or '<none>') for p in files)
     return {
         'path': str(path.relative_to(ROOT)).replace('\\', '/'),
+        'exists': True,
         'file_count': len(files),
         'total_bytes': sum(p.stat().st_size for p in files),
         'extensions': dict(sorted(exts.items())),
