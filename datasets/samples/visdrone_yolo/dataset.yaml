@@ -1,0 +1,15 @@
+path: C:\Users\hp\Downloads\dorne_interceptor\data\visdrone_yolo
+train: images/train
+val: images/val
+names:
+- pedestrian
+- people
+- bicycle
+- car
+- van
+- truck
+- tricycle
+- awning-tricycle
+- bus
+- motor
+- others

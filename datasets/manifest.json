@@ -1,0 +1,52 @@
+{
+  "full_local_datasets": [
+    {
+      "path": "data/combined_target_yolo",
+      "file_count": 16759,
+      "total_bytes": 2027401149,
+      "extensions": {
+        ".cache": 2,
+        ".jpg": 8378,
+        ".txt": 8378,
+        ".yaml": 1
+      }
+    },
+    {
+      "path": "data/visdrone_yolo",
+      "file_count": 14041,
+      "total_bytes": 1653180707,
+      "extensions": {
+        ".cache": 2,
+        ".jpg": 7019,
+        ".txt": 7019,
+        ".yaml": 1
+      }
+    }
+  ],
+  "published_samples": [
+    {
+      "path": "datasets/samples/combined_target_yolo",
+      "file_count": 33,
+      "total_bytes": 2423575,
+      "extensions": {
+        ".jpg": 16,
+        ".txt": 16,
+        ".yaml": 1
+      }
+    },
+    {
+      "path": "datasets/samples/visdrone_yolo",
+      "file_count": 33,
+      "total_bytes": 4621089,
+      "extensions": {
+        ".jpg": 16,
+        ".txt": 16,
+        ".yaml": 1
+      }
+    }
+  ],
+  "notes": [
+    "Full datasets are kept in local data/ and ignored in Git to keep repository push-safe.",
+    "Published samples mirror structure and can be used for quick sanity checks."
+  ]
+}

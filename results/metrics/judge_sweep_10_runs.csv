@@ -1,0 +1,11 @@
+profile,spoof_enabled,targets_req,targets_out,missing_fields,false_spoof_off,quality_gate,deploy_gate,tab_ready,duration_s,mean_rmse,mean_success_rate
+nominal,False,3,3,0,False,True,True,True,1.049,4.031120846151083,0.33055555555555555
+nominal,True,3,3,0,False,True,True,True,3.225,4.031120846151083,0.33055555555555555
+moderate,False,5,5,0,False,True,False,True,7.29,5.37124880578115,0.41916666666666663
+moderate,True,5,5,0,False,True,False,True,7.978,5.37124880578115,0.41916666666666663
+dense,False,8,8,0,False,True,False,True,4.488,4.683664824831947,0.41875
+dense,True,8,8,0,False,True,False,True,4.825,4.683664824831947,0.41875
+stress,False,10,10,0,False,True,True,True,5.236,3.733938525832925,0.41916666666666663
+stress,True,10,10,0,False,True,True,True,8.832,3.733938525832925,0.41916666666666663
+spoof_heavy,False,6,6,0,False,True,False,True,3.467,3.8083687570297418,0.3493055555555556
+spoof_heavy,True,6,6,0,False,True,False,True,3.628,3.8083687570297418,0.3493055555555556

@@ -1,0 +1,2 @@
+run_seq,run_id,run_time,target_count,readiness_score,security_posture,quality_gate_passed,deployment_gate_passed,weighted_success_pct,rmse_p95_m,risk_p90,spoof_detect_rate_pct
+1,run_f6f084ffea60,14:37:24,3,76.03,AMBER,True,True,100.0,6.1846,0.6193,100.0

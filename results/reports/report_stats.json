@@ -1,0 +1,18 @@
+{
+  "run_registry_mission_runs": 598,
+  "per_target_samples": 3463,
+  "targets_range": {
+    "min": 3,
+    "max": 10
+  },
+  "ekf_success_rate_mean": 0.43062267025731604,
+  "ekf_success_rate_p90": 0.85,
+  "rmse_mean_m": 3.9444987013455663,
+  "rmse_p90_m": 6.342531531841734,
+  "mission_success_rate": 0.0,
+  "spoof_enabled_fraction": 0.31605351170568563,
+  "mean_compute_latency_ms": 177.28228927391976,
+  "mean_energy_consumption_j": 2385.964525226316,
+  "threat_risk_p90_mean": 0.6418058719044807,
+  "threat_risk_p90_p90": 0.7957167097949559
+}

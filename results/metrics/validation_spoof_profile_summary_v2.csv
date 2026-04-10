@@ -1,0 +1,11 @@
+profile,weighted_success_on_pct,mean_kill_on_pct,delta_link_snr_db,delta_spoof_detect_rate_pct,delta_packet_loss_obs_pct,quality_on
+Nominal,100.0,100.0,-5.183,100.0,0.0,True
+Nominal Dense,100.0,100.0,-2.045,100.0,0.0,True
+Noise Mid,100.0,100.0,-0.843,80.0,0.0,True
+Noise High,100.0,100.0,-0.72,80.0,0.0,True
+Drift High,100.0,100.0,-0.749,80.0,0.0,True
+Latency High,100.0,100.0,-1.05,83.33,0.0,True
+Packetloss High,100.0,100.0,-0.421,71.43,0.0,True
+Combined,100.0,100.0,-0.43,87.5,0.0,True
+Combined Hard,100.0,100.0,-0.351,75.0,0.0,True
+Max,100.0,100.0,-0.26,66.67,0.0,True

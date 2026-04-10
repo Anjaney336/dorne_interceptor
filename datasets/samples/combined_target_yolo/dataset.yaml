@@ -1,0 +1,5 @@
+path: C:/Users/hp/Downloads/dorne_interceptor/data/combined_target_yolo
+train: images/train
+val: images/val
+names:
+  - drone

@@ -1,0 +1,6 @@
+day,label,success_rate,redirect_success_rate,tracking_precision_ratio,mean_tracking_error_m,mean_loop_fps,rmse_m
+5,Day 5,0.0,,,,155.37217278175274,0.3300081491915709
+6,Day 6,0.0,,,,30.159944217038,
+7,Day 7,1.0,1.0,,,,
+9,Day 9,0.0,1.0,0.95,0.3937521546752133,140.8876839714653,
+10,Day 10,1.0,1.0,0.9605993298508991,0.33750490525316723,,

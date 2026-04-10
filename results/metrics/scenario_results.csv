@@ -1,0 +1,6 @@
+scenario,success,interception_time_s,rmse_m,mean_loop_fps,mean_stage_cost,final_distance_m,noise_level,model_label,log_file
+slow_drone,0,,0.194976,59.160833,6183.533208,219.007830,0.250000,standard,C:\Users\hp\Downloads\dorne_interceptor\logs\scenario_1.log
+fast_drone,0,,0.177466,58.413450,11454.471895,303.073659,0.250000,standard,C:\Users\hp\Downloads\dorne_interceptor\logs\scenario_2.log
+zig_zag_motion,0,,0.203572,49.901239,9058.776214,266.591448,0.350000,standard,C:\Users\hp\Downloads\dorne_interceptor\logs\scenario_3.log
+noisy_environment,0,,0.611569,58.114465,7353.093697,239.885996,1.050000,standard,C:\Users\hp\Downloads\dorne_interceptor\logs\scenario_4.log
+high_drift,0,,0.173169,56.781782,8421.045607,256.715382,0.550000,standard,C:\Users\hp\Downloads\dorne_interceptor\logs\scenario_5.log

@@ -1,0 +1,11 @@
+profile,targets,weighted_success_off_pct,weighted_success_on_pct,weighted_success_delta_pct,kill_prob_off_pct,kill_prob_on_pct,kill_prob_delta_pct,closest_approach_off_m,closest_approach_on_m,packet_loss_obs_on_pct,spoof_detect_rate_on_pct,quality_gate_off,quality_gate_on
+P1_nominal,3,48.61,48.61,0.0,0.0,0.0,0.0,8.136,8.136,2.27,100.0,True,True
+P2_nominal_dense,5,51.06,51.06,0.0,0.0,0.0,0.0,3.606,3.606,5.45,100.0,True,True
+P3_noise_mid,6,58.84,58.84,0.0,0.0,0.0,0.0,2.612,2.612,5.76,80.0,True,True
+P4_noise_high,6,63.49,63.49,0.0,0.0,0.0,0.0,2.738,2.738,6.67,80.0,True,True
+P5_drift_high,6,59.03,59.03,0.0,0.0,0.0,0.0,2.084,2.084,4.92,80.0,True,True
+P6_latency_high,7,47.61,47.61,0.0,0.0,0.0,0.0,3.494,3.494,8.31,83.33,True,True
+P7_packetloss_high,8,59.1,59.1,0.0,0.0,0.0,0.0,3.237,3.237,29.72,71.43,True,True
+P8_combo,9,59.73,59.73,0.0,0.0,0.0,0.0,3.586,3.586,19.24,87.5,True,True
+P9_combo_hard,9,54.38,54.38,0.0,0.0,0.0,0.0,3.858,3.858,23.94,75.0,True,True
+P10_max,10,54.85,54.85,0.0,0.0,0.0,0.0,3.598,3.598,27.23,66.67,True,True

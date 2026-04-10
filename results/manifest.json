@@ -1,0 +1,61 @@
+{
+  "published_results": [
+    {
+      "path": "results/graphs",
+      "file_count": 13,
+      "total_bytes": 8386239,
+      "extensions": {
+        ".png": 13
+      }
+    },
+    {
+      "path": "results/metrics",
+      "file_count": 11,
+      "total_bytes": 160990,
+      "extensions": {
+        ".csv": 11
+      }
+    },
+    {
+      "path": "results/reports",
+      "file_count": 26,
+      "total_bytes": 7601965,
+      "extensions": {
+        ".csv": 5,
+        ".json": 1,
+        ".pdf": 1,
+        ".png": 19
+      }
+    },
+    {
+      "path": "results/samples",
+      "file_count": 1,
+      "total_bytes": 77430,
+      "extensions": {
+        ".jpg": 1
+      }
+    }
+  ],
+  "local_outputs_snapshot": {
+    "path": "outputs",
+    "file_count": 1266,
+    "total_bytes": 9176866099,
+    "extensions": {
+      ".avi": 51,
+      ".csv": 18,
+      ".glb": 1,
+      ".html": 2,
+      ".jpg": 1,
+      ".json": 1067,
+      ".jsonl": 3,
+      ".md": 1,
+      ".mp4": 53,
+      ".pdf": 2,
+      ".png": 67
+    }
+  },
+  "notes": [
+    "Full raw outputs remain in local outputs/ and are not tracked due size.",
+    "Representative graphs, metrics and report artifacts are versioned under results/."
+  ]
+}
