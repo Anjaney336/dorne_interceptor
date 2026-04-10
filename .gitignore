@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+build/
+dist/
+logs/
+artifacts/
+checkpoints/
+outputs/
+runs/
+tmp_outputs/
+.vscode/
+archive (1)/
+Blocks/
+VisDrone2019-DET-test-dev/
+VisDrone2019-DET-train/
+VisDrone2019-DET-val/
+data/
+models/
+notebooks/
+dashboard/node_modules/

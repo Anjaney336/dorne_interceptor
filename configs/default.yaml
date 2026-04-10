@@ -1,0 +1,110 @@
+system:
+  name: drone_interceptor
+  log_level: INFO
+  random_seed: 7
+
+mission:
+  time_step: 0.1
+  max_steps: 250
+  arena_size_m: 1000.0
+
+perception:
+  detector_backend: ultralytics
+  model_path: yolov10s.pt
+  confidence_threshold: 0.4
+  inference_imgsz: 640
+  image_width: 1280
+  image_height: 720
+  synthetic_measurement_noise_std_m: 1.25
+
+tracking:
+  mode: kalman
+  process_noise: 0.15
+  measurement_noise: 0.5
+  initial_velocity_std: 6.0
+  max_target_acceleration_mps2: 4.0
+  acceleration_smoothing: 0.7
+
+prediction:
+  horizon_steps: 8
+  history_steps: 8
+  lstm_checkpoint:
+  lstm_residual_gain: 0.25
+  process_noise: 0.15
+  acceleration_damping: 0.55
+
+planning:
+  desired_intercept_distance_m: 10.0
+  max_speed_mps: 20.0
+
+control:
+  mode: pn
+  kp_position: 0.8
+  kd_velocity: 0.2
+  navigation_constant: 4.5
+  terminal_gain: 1.5
+  max_acceleration_mps2: 18.0
+  min_closing_speed_mps: 0.5
+  time_to_go_gain: 1.4
+  target_acceleration_gain: 0.5
+  uncertainty_gain: 0.25
+  mpc_horizon_steps: 8
+  mpc_candidate_acceleration_levels: 7
+  mpc_num_trajectories: 18
+  mpc_guidance_blend: 0.45
+  mpc_position_weight: 1.0
+  mpc_velocity_weight: 0.3
+  mpc_control_weight: 0.05
+
+navigation:
+  gps_noise_std_m: 1.5
+  imu_noise_std_mps2: 0.15
+  gps_drift_rate_mps: 0.2
+  process_noise_scale: 1.0
+  measurement_noise_scale: 1.0
+
+constraints:
+  physical:
+    max_velocity_mps: 20.0
+    max_acceleration_mps2: 18.0
+  tracking:
+    max_position_error_m: 0.5
+  drift:
+    min_rate_mps: 0.2
+    max_rate_mps: 0.5
+  safety:
+    min_separation_m: 5.0
+    collision_radius_m: 1.0
+
+simulation:
+  interceptor_initial_position: [0.0, 0.0, 100.0]
+  interceptor_initial_velocity: [0.0, 0.0, 0.0]
+  target_initial_position: [300.0, 150.0, 120.0]
+  target_initial_velocity: [-6.0, 2.0, 0.0]
+  target_max_acceleration_mps2: 4.0
+  interceptor_process_noise_std_mps2: 0.2
+  target_process_noise_std_mps2: 0.35
+  wind_disturbance_std_mps2: 0.15
+
+visualization:
+  output_dir: outputs
+  save_outputs: true
+
+optimization:
+  alpha: 0.1
+  beta: 10.0
+  gamma: 1.5
+  horizon_steps: 8
+  num_trajectories: 18
+
+airsim:
+  host: 127.0.0.1
+  port: 41451
+  timeout_s: 60
+  vehicle_name: ""
+  use_ned_z: true
+
+day4:
+  demo_fps: 20.44
+  video_width: 1280
+  video_height: 720
