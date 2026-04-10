@@ -1,0 +1,46 @@
+﻿budgets:
+  day10_benchmark:
+    csv_path: results/metrics/day10_benchmark.csv
+    checks:
+      - column: redirected_to_safe_area
+        rule: all_true
+      - column: intercepted
+        rule: all_true
+      - column: mean_tracking_error_m
+        rule: max
+        threshold: 0.45
+      - column: tracking_precision_ratio
+        rule: min
+        threshold: 0.85
+      - column: peak_speed_mps
+        rule: max
+        threshold: 21.0
+      - column: safe_zone_distance_improvement_m
+        rule: min
+        threshold: 95.0
+
+  day9_benchmark:
+    csv_path: results/metrics/day9_benchmark.csv
+    checks:
+      - column: redirected_to_safe_area
+        rule: all_true
+      - column: mean_tracking_error_m
+        rule: max
+        threshold: 0.70
+      - column: peak_speed_mps
+        rule: max
+        threshold: 11.0
+
+  judge_sweep:
+    csv_path: results/metrics/judge_sweep_10_runs.csv
+    checks:
+      - column: quality_gate
+        rule: all_true
+      - column: tab_ready
+        rule: all_true
+      - column: deploy_gate
+        rule: ratio_true
+        threshold: 0.40
+      - column: mean_rmse
+        rule: max
+        threshold: 6.0

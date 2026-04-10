@@ -1,0 +1,6 @@
+﻿id,hazard,trigger,effect,severity,likelihood,detectability,mitigation,verification
+HZ-001,GNSS spoofing divergence,Large position innovation,Unsafe intercept guidance,High,Medium,High,EKF innovation gate + trust scaling,tests/test_day8_airsim_manager.py
+HZ-002,Constraint breach,Controller overshoot,Loss of safe envelope,High,Low,High,Constraint model velocity/acceleration clamps,tests/test_constraints.py
+HZ-003,Telemetry corruption,Missing/invalid backend fields,Wrong operator decisions,Medium,Medium,Medium,Schema checks + backend tests,test_mission_backend.py
+HZ-004,Packet-loss degradation,RF link stress,Tracking instability,Medium,High,Medium,Adaptive process/measurement scaling + replay validation,results/metrics/day9_benchmark.csv
+HZ-005,Release artifact drift,Untracked datasets/results,Audit failure,Medium,Medium,High,Manifest generation + validation gates,scripts/validate_repo_manifests.py

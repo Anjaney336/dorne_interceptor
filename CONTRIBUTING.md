@@ -39,6 +39,15 @@ python scripts/generate_repo_manifests.py
 python scripts/validate_repo_manifests.py
 ```
 
+## Advanced Assurance Gates
+Run before merge for mission-grade workflow checks:
+
+```powershell
+python scripts/validate_requirements_traceability.py
+python scripts/check_performance_budgets.py
+python scripts/run_assurance_gates.py
+```
+
 ## Commit Style
 Use concise, imperative commit messages.
 Examples:

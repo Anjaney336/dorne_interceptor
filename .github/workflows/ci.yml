@@ -35,6 +35,14 @@ jobs:
         run: |
           python scripts/validate_repo_manifests.py
 
+      - name: Validate requirements traceability
+        run: |
+          python scripts/validate_requirements_traceability.py
+
+      - name: Validate performance budgets
+        run: |
+          python scripts/check_performance_budgets.py
+
       - name: Pytest smoke suite
         run: |
-          pytest -q tests/test_smoke.py tests/test_airsim_connection.py tests/test_constraints.py
+          pytest -q tests/test_smoke.py tests/test_airsim_connection.py tests/test_constraints.py tests/test_assurance_workflow.py

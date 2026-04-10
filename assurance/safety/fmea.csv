@@ -1,0 +1,5 @@
+﻿item,failure_mode,effect,cause,control,detection,residual_risk
+FMEA-001,EKF trusts spoofed updates,Trajectory drift,Innovation gate too weak,Hard spoof trust scale + gating,Regression tests,Low
+FMEA-002,Controller command spike,Unsafe maneuver,Guidance gain mismatch,Constraint clamping,Constraint tests,Low
+FMEA-003,Mission replay non-determinism,Benchmark variance,Unseeded random source,Seeded replay inputs,Replay tests,Medium
+FMEA-004,Manifest stale after artifact edits,Release inconsistency,Manual workflow error,Automated manifest validation,CI job,Low

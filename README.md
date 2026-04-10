@@ -44,6 +44,8 @@ python scripts/run_combined_target_validation.py
 - Continuous integration: `.github/workflows/ci.yml`
   - Lint (runtime-critical checks)
   - Manifest validation
+  - Requirements traceability validation
+  - Performance budget gate validation
   - Pytest smoke suite
 - Artifact release pipeline: `.github/workflows/release-artifacts.yml`
   - Generates zipped/tarred dataset/result bundles
@@ -67,3 +69,5 @@ python scripts/validate_repo_manifests.py
 - Issue templates: `.github/ISSUE_TEMPLATE/`
 - PR template: `.github/pull_request_template.md`
 - Project board setup: `docs/GITHUB_PROJECT_SETUP.md`
+- Advanced assurance architecture: `docs/ADVANCED_ASSURANCE_ARCHITECTURE.md`
+- Safety package: `assurance/safety/`

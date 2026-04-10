@@ -1,0 +1,41 @@
+﻿requirements:
+  - id: REQ-NAV-001
+    title: EKF must reject high-innovation spoofed measurements
+    module_globs:
+      - src/drone_interceptor/navigation/ekf_filter.py
+    test_globs:
+      - tests/test_day8_airsim_manager.py
+  - id: REQ-SIM-002
+    title: AirSim mission replay must produce deterministic telemetry frames for seeded runs
+    module_globs:
+      - src/drone_interceptor/simulation/airsim_manager.py
+    test_globs:
+      - tests/test_day8_airsim_manager.py
+  - id: REQ-BE-003
+    title: Backend mission service must expose stable mission run records
+    module_globs:
+      - src/drone_interceptor/backend/mission_service.py
+      - src/drone_interceptor/backend/run_store.py
+    test_globs:
+      - test_mission_backend.py
+  - id: REQ-CMD-004
+    title: Control constraints must enforce speed and acceleration safety bounds
+    module_globs:
+      - src/drone_interceptor/constraints.py
+      - src/drone_interceptor/control/controller.py
+    test_globs:
+      - tests/test_constraints.py
+      - tests/test_day4_controller_constraints.py
+  - id: REQ-OBS-005
+    title: Telemetry API must expose live target/interceptor state for analytics pipeline
+    module_globs:
+      - src/drone_interceptor/simulation/telemetry_api.py
+    test_globs:
+      - tests/test_day8_telemetry_api.py
+  - id: REQ-REL-006
+    title: Curated datasets and results must remain publishable via manifest-validated artifacts
+    module_globs:
+      - scripts/generate_repo_manifests.py
+      - scripts/validate_repo_manifests.py
+    test_globs:
+      - tests/test_assurance_workflow.py
