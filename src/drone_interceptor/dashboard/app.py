@@ -5883,18 +5883,19 @@ def set_custom_style() -> None:
                 linear-gradient(180deg, #07090D 0%, #0A0A0B 62%, #090B10 100%);
             color: var(--text-main);
             font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
         [data-testid="stMainBlockContainer"] {
             max-width: 100% !important;
             padding-top: 0.55rem;
             padding-bottom: 0.30rem;
-            height: calc(100vh - 1.1rem);
-            overflow: hidden;
+            height: auto;
+            overflow: visible;
         }
         [data-baseweb="tab-panel"] {
-            height: calc(100vh - 248px);
-            overflow-y: auto;
+            height: auto;
+            overflow-y: visible;
             overflow-x: hidden;
             padding-right: 0.35rem;
         }
