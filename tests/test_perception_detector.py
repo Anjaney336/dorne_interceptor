@@ -10,7 +10,8 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from drone_interceptor.perception.detector import TargetDetector
+from drone_interceptor.perception.detector import TargetDetector, score_weighted_detection_targets
+from drone_interceptor.types import Detection
 
 
 def _base_config() -> dict:
@@ -47,3 +48,25 @@ def test_detector_extracts_frame_when_available() -> None:
 
     assert extracted is not None
     assert extracted.shape == (32, 32, 3)
+
+
+def test_weighted_detection_scores_prioritize_drone_labels() -> None:
+    detection = Detection(
+        position=np.array([0.0, 0.0, 0.0], dtype=float),
+        confidence=0.9,
+        metadata={
+            "targets": [
+                {"class_name": "drone", "confidence": 0.90},
+                {"class_name": "car", "confidence": 0.80},
+                {"class_name": "person", "confidence": 0.70},
+            ]
+        },
+    )
+
+    summary = score_weighted_detection_targets(detection)
+
+    assert summary["target_count"] == 3
+    assert summary["drone_count"] == 1
+    assert summary["weighted_total_score"] > 2.0
+    assert summary["drone_focus_score"] >= 2.0
+    assert summary["class_histogram"]["drone"] == 1

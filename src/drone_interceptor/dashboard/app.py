@@ -13,6 +13,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any
+from collections import Counter
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
@@ -38,7 +39,7 @@ from drone_interceptor.control.controller import InterceptionController
 from drone_interceptor.navigation.drift_model.dp5_safe import AttackProfile, DP5CoordinateSpoofingToolkit
 from drone_interceptor.navigation.state_estimator import GPSIMUKalmanFusion, simulate_gps_with_drift
 from drone_interceptor.optimization.cost import InterceptionCostModel
-from drone_interceptor.perception.detector import TargetDetector
+from drone_interceptor.perception.detector import TargetDetector, score_weighted_detection_targets
 from drone_interceptor.planning.planner import InterceptPlanner
 from drone_interceptor.prediction.predictor import TargetPredictor
 from drone_interceptor.simulation.airsim_manager import AirSimMissionManager, MissionReplay, MonteCarloSummary, local_position_to_lla
@@ -1734,6 +1735,29 @@ def _resolve_solidworks_model_path() -> Path | None:
     return None
 
 
+def _artifact_video_candidates() -> list[Path]:
+    candidates: list[Path] = []
+    if not OUTPUTS.exists():
+        return candidates
+
+    preferred_names = (
+        "day9_dp5_demo.mp4",
+        "day8_bms_demo.mp4",
+        "final_demo.mp4",
+    )
+    for name in preferred_names:
+        path = OUTPUTS / name
+        if path.exists() and path.is_file():
+            candidates.append(path)
+
+    mp4_files = sorted(OUTPUTS.glob("*.mp4"), key=lambda p: p.name.lower())
+    avi_files = sorted(OUTPUTS.glob("*.avi"), key=lambda p: p.name.lower())
+    for path in (*mp4_files, *avi_files):
+        if path not in candidates:
+            candidates.append(path)
+    return candidates
+
+
 @st.cache_data(show_spinner=False)
 def _load_glb_data_url(path_str: str) -> str:
     payload = Path(path_str).read_bytes()
@@ -2830,6 +2854,7 @@ def _run_dashboard_case(
     tracking_errors: list[float] = []
     fps_samples: list[float] = []
     detections: list[list[float]] = []
+    detection_events: list[dict[str, Any]] = []
 
     success = False
     interception_time_s: float | None = None
@@ -2902,6 +2927,23 @@ def _run_dashboard_case(
         tracking_errors.append(tracking_error_m)
         fps_samples.append(loop_fps)
         detections.append(np.asarray(detection.position, dtype=float).tolist())
+        weighted_summary = score_weighted_detection_targets(detection)
+        weighted_targets = weighted_summary.get("weighted_targets", [])
+        primary_target = weighted_targets[0] if weighted_targets else {}
+        detection_events.append(
+            {
+                "step": int(step),
+                "time_s": float(observation["time"][0]),
+                "weighted_total_score": float(weighted_summary.get("weighted_total_score", 0.0)),
+                "normalized_weighted_score": float(weighted_summary.get("normalized_weighted_score", 0.0)),
+                "drone_focus_score": float(weighted_summary.get("drone_focus_score", 0.0)),
+                "target_count": int(weighted_summary.get("target_count", 0)),
+                "drone_count": int(weighted_summary.get("drone_count", 0)),
+                "mean_confidence": float(weighted_summary.get("mean_confidence", 0.0)),
+                "primary_label": str(primary_target.get("class_name", "unknown")),
+                "class_histogram": dict(weighted_summary.get("class_histogram", {})),
+            }
+        )
         final_distance_m = float(info["distance_to_target"])
 
         if done:
@@ -2924,6 +2966,7 @@ def _run_dashboard_case(
         "tracking_errors": tracking_errors,
         "fps_samples": fps_samples,
         "detections": detections,
+        "detection_events": detection_events,
         "success": success,
         "success_rate": 1.0 if success else 0.0,
         "interception_time_s": interception_time_s,
@@ -4038,6 +4081,102 @@ def _build_mission_history_frame() -> pd.DataFrame:
     return history_frame
 
 
+def _build_weighted_detection_frame() -> pd.DataFrame:
+    simulation = st.session_state.get("dashboard_simulation")
+    if not isinstance(simulation, dict):
+        return pd.DataFrame()
+    events = simulation.get("detection_events")
+    if not isinstance(events, list) or not events:
+        return pd.DataFrame()
+    frame = pd.DataFrame(events)
+    required = {
+        "time_s",
+        "weighted_total_score",
+        "normalized_weighted_score",
+        "drone_focus_score",
+        "target_count",
+        "drone_count",
+        "mean_confidence",
+    }
+    if not required.issubset(set(frame.columns)):
+        return pd.DataFrame()
+    return frame
+
+
+def _build_weighted_detection_figure(frame: pd.DataFrame) -> go.Figure:
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=frame["time_s"],
+            y=frame["normalized_weighted_score"],
+            mode="lines+markers",
+            name="Normalized Weighted Score",
+            line=dict(color="#00F0FF", width=2),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=frame["time_s"],
+            y=frame["drone_focus_score"],
+            mode="lines+markers",
+            name="Drone Focus Score",
+            line=dict(color="#73F0A0", width=2),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=frame["time_s"],
+            y=frame["mean_confidence"],
+            mode="lines+markers",
+            name="Mean Confidence",
+            line=dict(color="#FFB800", width=2),
+            yaxis="y2",
+        )
+    )
+    fig.update_layout(
+        title="Weighted Object and Drone Detection Confidence Over Time",
+        xaxis_title="Mission Time [s]",
+        yaxis=dict(title="Weighted Score", rangemode="tozero"),
+        yaxis2=dict(title="Mean Confidence", overlaying="y", side="right", rangemode="tozero"),
+        height=340,
+        margin=dict(l=20, r=20, t=45, b=20),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0.0),
+    )
+    return fig
+
+
+def _build_weighted_detection_class_bar(frame: pd.DataFrame) -> go.Figure:
+    histogram = Counter()
+    for item in frame.get("class_histogram", []):
+        if isinstance(item, dict):
+            for label, count in item.items():
+                histogram[str(label)] += int(count)
+    labels = list(histogram.keys()) or ["drone"]
+    counts = [histogram.get(label, 0) for label in labels] or [0]
+    fig = go.Figure(
+        data=[
+            go.Bar(
+                x=labels,
+                y=counts,
+                marker=dict(color="#5ED2FF"),
+                name="Detections",
+            )
+        ]
+    )
+    fig.update_layout(
+        title="Object-Class Detection Distribution",
+        xaxis_title="Class",
+        yaxis_title="Count",
+        height=320,
+        margin=dict(l=20, r=20, t=45, b=20),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+    )
+    return fig
+
+
 def _render_live_analytics_gallery(frame: pd.DataFrame, key_suffix: str) -> None:
     canonical_backend_frame = _build_live_analytics_frame_from_results()
     if not canonical_backend_frame.empty:
@@ -4067,7 +4206,7 @@ def _render_live_analytics_gallery(frame: pd.DataFrame, key_suffix: str) -> None
     metric_cols[3].metric("Measured RMSE", f"{float(backend_snapshot.get('rmse_measured_true_m', backend_snapshot.get('rmse_m', 0.0))):.3f} m")
     metric_cols[4].metric("Threat Risk P90", f"{float(global_metrics.get('risk_index_p90', 0.0)):.3f}")
     metric_cols[5].metric("Spoof Detect Rate", f"{float(global_metrics.get('spoofing_detection_rate', 0.0)) * 100:.1f}%")
-    tabs = st.tabs(["Noise / RMSE", "Scenario Success", "Runtime / Terminal", "Mission Trends"])
+    tabs = st.tabs(["Noise / RMSE", "Scenario Success", "Runtime / Terminal", "Mission Trends", "Weighted Detection"])
     with tabs[0]:
         st.plotly_chart(
             _build_live_rmse_noise_figure(frame),
@@ -4188,6 +4327,61 @@ def _render_live_analytics_gallery(frame: pd.DataFrame, key_suffix: str) -> None
                 width="stretch",
                 hide_index=True,
             )
+    with tabs[4]:
+        detection_frame = _build_weighted_detection_frame()
+        if detection_frame.empty:
+            st.info("Weighted detection analytics will populate after running a live mission.")
+        else:
+            metrics = st.columns(4)
+            metrics[0].metric(
+                "Weighted Score Avg",
+                f"{float(pd.to_numeric(detection_frame['normalized_weighted_score'], errors='coerce').mean()):.3f}",
+            )
+            metrics[1].metric(
+                "Drone Focus Peak",
+                f"{float(pd.to_numeric(detection_frame['drone_focus_score'], errors='coerce').max()):.3f}",
+            )
+            metrics[2].metric(
+                "Drone Detections (sum)",
+                f"{int(pd.to_numeric(detection_frame['drone_count'], errors='coerce').fillna(0).sum())}",
+            )
+            metrics[3].metric(
+                "Mean Confidence Avg",
+                f"{float(pd.to_numeric(detection_frame['mean_confidence'], errors='coerce').mean()):.3f}",
+            )
+            left, right = st.columns([1.2, 0.8])
+            with left:
+                st.plotly_chart(
+                    _build_weighted_detection_figure(detection_frame),
+                    width="stretch",
+                    key=f"weighted_detection_{key_suffix}",
+                    config={"displayModeBar": False},
+                )
+            with right:
+                st.plotly_chart(
+                    _build_weighted_detection_class_bar(detection_frame),
+                    width="stretch",
+                    key=f"weighted_detection_class_{key_suffix}",
+                    config={"displayModeBar": False},
+                )
+                table_cols = [
+                    "time_s",
+                    "primary_label",
+                    "target_count",
+                    "drone_count",
+                    "normalized_weighted_score",
+                    "mean_confidence",
+                ]
+                preview = detection_frame[table_cols].tail(12).copy()
+                preview.columns = [
+                    "Time [s]",
+                    "Primary Label",
+                    "Targets",
+                    "Drones",
+                    "Weighted Score",
+                    "Mean Conf.",
+                ]
+                st.dataframe(preview, width="stretch", hide_index=True)
 
 
 def _slice_benchmark_frame(frame: pd.DataFrame, rows: int) -> pd.DataFrame:

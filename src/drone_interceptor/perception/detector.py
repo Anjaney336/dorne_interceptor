@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 from dataclasses import dataclass
+from collections.abc import Iterable
 
 import numpy as np
 
@@ -231,6 +232,29 @@ class DetectorBenchmarkSummary:
     device_label: str
 
 
+DEFAULT_DETECTION_CLASS_WEIGHTS: dict[str, float] = {
+    "drone": 2.4,
+    "uav": 2.4,
+    "aircraft": 2.0,
+    "helicopter": 1.8,
+    "person": 1.0,
+    "pedestrian": 1.0,
+    "car": 1.1,
+    "van": 1.15,
+    "bus": 1.2,
+    "truck": 1.2,
+    "motor": 1.0,
+    "bicycle": 0.9,
+}
+
+DEFAULT_DRONE_LABEL_ALIASES: set[str] = {
+    "drone",
+    "uav",
+    "aircraft",
+    "helicopter",
+}
+
+
 def benchmark_detection_sets(
     ground_truth_sets: list[list[DetectionBox]],
     prediction_sets: list[list[DetectionBox]],
@@ -289,6 +313,75 @@ def benchmark_detection_sets(
     )
 
 
+def score_weighted_detection_targets(
+    detection: Detection,
+    *,
+    class_weights: dict[str, float] | None = None,
+    drone_aliases: Iterable[str] | None = None,
+) -> dict[str, Any]:
+    weights = {
+        str(key).strip().lower(): float(value)
+        for key, value in (class_weights or DEFAULT_DETECTION_CLASS_WEIGHTS).items()
+    }
+    aliases = {str(item).strip().lower() for item in (drone_aliases or DEFAULT_DRONE_LABEL_ALIASES)}
+
+    raw_targets = detection.metadata.get("targets")
+    targets: list[dict[str, Any]]
+    if isinstance(raw_targets, list) and raw_targets:
+        targets = [item for item in raw_targets if isinstance(item, dict)]
+    else:
+        targets = [
+            {
+                "class_name": detection.metadata.get("class_name", "drone"),
+                "confidence": float(detection.confidence),
+            }
+        ]
+
+    weighted_total = 0.0
+    drone_weighted_total = 0.0
+    confidence_total = 0.0
+    drone_count = 0
+    class_histogram: dict[str, int] = {}
+    weighted_targets: list[dict[str, Any]] = []
+
+    for target in targets:
+        label = str(target.get("class_name", "unknown")).strip().lower()
+        confidence = float(target.get("confidence", 0.0))
+        weight = float(weights.get(label, 1.0))
+        weighted_confidence = float(confidence * weight)
+        is_drone = label in aliases
+        if is_drone:
+            drone_count += 1
+            drone_weighted_total += weighted_confidence
+        weighted_total += weighted_confidence
+        confidence_total += confidence
+        class_histogram[label] = class_histogram.get(label, 0) + 1
+        weighted_targets.append(
+            {
+                "class_name": label,
+                "confidence": confidence,
+                "weight": weight,
+                "weighted_confidence": weighted_confidence,
+                "is_drone": is_drone,
+            }
+        )
+
+    target_count = len(weighted_targets)
+    mean_confidence = float(confidence_total / max(target_count, 1))
+    normalized_weighted_score = float(weighted_total / max(target_count, 1))
+    drone_focus_score = float(drone_weighted_total / max(drone_count, 1))
+    return {
+        "target_count": int(target_count),
+        "drone_count": int(drone_count),
+        "weighted_total_score": float(weighted_total),
+        "normalized_weighted_score": normalized_weighted_score,
+        "drone_focus_score": drone_focus_score,
+        "mean_confidence": mean_confidence,
+        "class_histogram": class_histogram,
+        "weighted_targets": weighted_targets,
+    }
+
+
 def _box_iou(left: DetectionBox, right: DetectionBox) -> float:
     x1 = max(float(left.x1), float(right.x1))
     y1 = max(float(left.y1), float(right.y1))
@@ -310,8 +403,11 @@ def _safe_ratio(numerator: float, denominator: float) -> float:
 
 
 __all__ = [
+    "DEFAULT_DETECTION_CLASS_WEIGHTS",
+    "DEFAULT_DRONE_LABEL_ALIASES",
     "DetectionBox",
     "DetectorBenchmarkSummary",
     "TargetDetector",
     "benchmark_detection_sets",
+    "score_weighted_detection_targets",
 ]
