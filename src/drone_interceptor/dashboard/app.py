@@ -3148,10 +3148,10 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
     spoof_offset_m = np.linalg.norm(drifted - target, axis=1) if len(target) == len(drifted) and len(target) > 0 else np.asarray([0.0], dtype=float)
 
     figure = go.Figure()
-    figure.add_trace(go.Scatter(x=target[:, 0], y=target[:, 1], mode="lines", name="Target True", line=dict(color="#ff845c", width=6)))
+    figure.add_trace(go.Scatter(x=target[:, 0], y=target[:, 1], mode="lines", name="Target", line=dict(color="#ff845c", width=6)))
     figure.add_trace(go.Scatter(x=interceptor[:, 0], y=interceptor[:, 1], mode="lines", name="Interceptor", line=dict(color="#5ed2ff", width=6)))
-    figure.add_trace(go.Scatter(x=fused[:, 0], y=fused[:, 1], mode="lines", name="EKF Filtered", line=dict(color="#73f0a0", width=5)))
-    figure.add_trace(go.Scatter(x=drifted[:, 0], y=drifted[:, 1], mode="lines", name="Raw Drifted", line=dict(color="#ff4b4b", width=4, dash="dash")))
+    figure.add_trace(go.Scatter(x=fused[:, 0], y=fused[:, 1], mode="lines", name="EKF", line=dict(color="#73f0a0", width=5)))
+    figure.add_trace(go.Scatter(x=drifted[:, 0], y=drifted[:, 1], mode="lines", name="Raw Drift", line=dict(color="#ff4b4b", width=4, dash="dash")))
     if len(target) > 0 and len(drifted) > 0:
         connector_step = max(1, int(len(target) / 10))
         connector_x: list[float | None] = []
@@ -3168,6 +3168,7 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
                     name="True↔Spoof Offset",
                     line=dict(color="#ffd36a", width=1.8, dash="dot"),
                     opacity=0.65,
+                    showlegend=False,
                 )
             )
 
@@ -3184,6 +3185,7 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
                 name="Target Velocity",
                 line=dict(color="#ff845c", width=8),
                 marker=dict(size=3, color="#ff845c"),
+                showlegend=False,
             )
         )
         figure.add_trace(
@@ -3194,6 +3196,7 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
                 name="Interceptor Velocity",
                 line=dict(color="#5ed2ff", width=8),
                 marker=dict(size=3, color="#5ed2ff"),
+                showlegend=False,
             )
         )
 
@@ -3207,6 +3210,7 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
                 mode="lines",
                 name="Current Spoof Offset",
                 line=dict(color="#ffd36a", width=3.5, dash="dashdot"),
+                showlegend=False,
             )
         )
         figure.add_trace(
@@ -3214,7 +3218,7 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
                 x=[float(current_true[0])],
                 y=[float(current_true[1])],
                 mode="markers+text",
-                name="Actual Position (Current)",
+                name="Actual Position",
                 text=["Actual"],
                 textposition="top center",
                 marker=dict(size=12, color="#ff845c", line=dict(color="#ffe9df", width=1.6), symbol="circle"),
@@ -3225,7 +3229,7 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
                 x=[float(current_spoof[0])],
                 y=[float(current_spoof[1])],
                 mode="markers+text",
-                name="Spoofed Position (Current)",
+                name="Spoofed Position",
                 text=["Spoofed"],
                 textposition="bottom center",
                 marker=dict(size=12, color="#ff4b4b", line=dict(color="#ffd9d9", width=1.6), symbol="x"),
@@ -3272,16 +3276,27 @@ def _build_3d_figure(simulation: dict[str, Any], upto_index: int | None = None) 
     figure.frames = frames
 
     figure.update_layout(
-        height=720,
-        margin=dict(l=0, r=0, t=30, b=0),
+        height=760,
+        margin=dict(l=52, r=170, t=64, b=52),
         title=(
-            f"Trajectory Plot Source: {source} | "
+            f"Trajectory ({source}) | "
             f"Spoof Offset Mean={float(np.mean(spoof_offset_m)):.2f} m, "
             f"Current={float(spoof_offset_m[-1]) if len(spoof_offset_m) > 0 else 0.0:.2f} m"
         ),
-        xaxis=dict(title="X [m]", gridcolor="#2a3948"),
-        yaxis=dict(title="Y [m]", gridcolor="#2a3948", scaleanchor="x", scaleratio=1),
-        legend=dict(orientation="h", y=1.02, x=0.0),
+        xaxis=dict(title="X [m]", gridcolor="#2a3948", title_standoff=12),
+        yaxis=dict(title="Y [m]", gridcolor="#2a3948", scaleanchor="x", scaleratio=1, title_standoff=10),
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1.0,
+            xanchor="left",
+            x=1.01,
+            bgcolor="rgba(7,12,18,0.68)",
+            bordercolor="rgba(0,240,255,0.25)",
+            borderwidth=1,
+            font=dict(size=12),
+            tracegroupgap=5,
+        ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         updatemenus=[
