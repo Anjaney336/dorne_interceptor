@@ -1,8 +1,8 @@
+numpy
 torch
 ultralytics
 opencv-python
 deep-sort-realtime
-numpy
 matplotlib
 Pillow
 imageio-ffmpeg
